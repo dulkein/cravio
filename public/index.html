@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cravio - What Should You Eat?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .mood-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mood-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .mood-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mood-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .result h4 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .error {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .info-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .server-status {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .status-online {
+            color: #28a745;
+        }
+
+        .status-offline {
+            color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Cravio</h1>
+            <p>Your AI-powered meal companion</p>
+        </div>
+
+        <div class="main-content">
+            <div class="server-status" id="serverStatus">
+                <strong>🔄 Checking server connection...</strong>
+            </div>
+
+            <div class="info-box">
+                <strong>Welcome to Cravio!</strong> Tell us how you're feeling and what's in your fridge, and our AI
+                will suggest the perfect meal for you with a detailed recipe!
+            </div>
+
+            <div class="form-section">
+                <h3>😊 How are you feeling right now?</h3>
+                <div class="mood-buttons">
+                    <button class="mood-btn" data-mood="happy">😊 Happy</button>
+                    <button class="mood-btn" data-mood="stressed">😰 Stressed</button>
+                    <button class="mood-btn" data-mood="tired">😴 Tired</button>
+                    <button class="mood-btn" data-mood="excited">🤩 Excited</button>
+                    <button class="mood-btn" data-mood="sad">😢 Sad</button>
+                    <button class="mood-btn" data-mood="comfort">🤗 Need Comfort</button>
+                </div>
+                <textarea id="customMood" placeholder="Or describe your mood in your own words..." rows="2"></textarea>
+            </div>
+
+            <div class="form-section">
+                <h3>🥗 What's in your fridge?</h3>
+                <textarea id="ingredients"
+                    placeholder="List your ingredients... (e.g., chicken breast, broccoli, rice, garlic, onions, cheese)"
+                    rows="4"></textarea>
+            </div>
+
+            <button class="generate-btn" onclick="generateMealSuggestion()">
+                ✨ Find My Perfect Meal
+            </button>
+
+            <div class="error" id="error"></div>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMood = '';
+
+        // Check if server is running
+        async function checkServerStatus() {
+            const statusDiv = document.getElementById('serverStatus');
+            try {
+                const response = await fetch('http://localhost:3000/api/health');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<strong class="status-online">✅ Server is running - Ready to get meal suggestions!</strong>';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<strong class="status-offline">❌ Server not running. Please start the backend server first.</strong>';
+            }
+        }
+
+        // Check server status when page loads
+        window.addEventListener('load', checkServerStatus);
+
+        // Handle mood button selection
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedMood = btn.dataset.mood;
+                document.getElementById('customMood').value = '';
+            });
+        });
+
+        document.getElementById('customMood').addEventListener('input', () => {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            selectedMood = '';
+        });
+
+        async function generateMealSuggestion() {
+            const customMood = document.getElementById('customMood').value.trim();
+            const ingredients = document.getElementById('ingredients').value.trim();
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            const btn = document.querySelector('.generate-btn');
+
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            // Validation
+            if (!selectedMood && !customMood) {
+                showError('Please tell us how you\'re feeling!');
+                return;
+            }
+
+            if (!ingredients) {
+                showError('Please list what ingredients you have!');
+                return;
+            }
+
+            const mood = customMood || selectedMood;
+
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '🤔 AI is thinking...';
+
+            try {
+                // Call our backend API
+                const response = await fetch('http://localhost:3000/api/meal-suggestion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mood: mood,
+                        ingredients: ingredients
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error');
+                }
+
+                const data = await response.json();
+
+                // Show AI-generated result
+                resultDiv.innerHTML = `<h4>🎉 Your AI-Generated Meal Suggestions</h4>${data.suggestion}`;
+                resultDiv.style.display = 'block';
+                resultDiv.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error:', error);
+                if (error.message.includes('Failed to fetch')) {
+                    showError('Cannot connect to server. Make sure the backend server is running on localhost:3000');
+                } else {
+                    showError(`Error: ${error.message}`);
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ Find My Perfect Meal';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.scrollIntoView({ behavior: 'smoking' });
+        }
+
+        // Keyboard shortcuts
+        document.getElementById('customMood').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('ingredients').focus();
+            }
+        });
+
+        document.getElementById('ingredients').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                generateMealSuggestion();
+            }
+        }
+        );
+    </script>
+</body>
+
+</html>
