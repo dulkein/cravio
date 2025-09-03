@@ -7,7 +7,7 @@ const app = express();
 const PORT = 3000;
 
 // Your OpenAI API key (⚠️ best practice: load from environment variable)
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "OPEN_AI_API";
 
 // Middleware
 app.use(cors());
@@ -95,4 +95,5 @@ Format your response like this:
         });
     }
 });
+
 
